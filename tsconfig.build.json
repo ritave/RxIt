@@ -4,7 +4,7 @@
     "declaration": true,
     "inlineSources": true,
     "noEmit": false,
-    "outDir": "distasd",
+    "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true
   },
