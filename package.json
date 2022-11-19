@@ -1,7 +1,7 @@
 {
   "name": "rxit",
   "version": "0.1.0",
-  "description": "Reactive iterator transformations for JavaScript.",
+  "description": "Reactive iterators for JavaScript.",
   "repository": {
     "type": "git",
     "url": "https://github.com/ritave/RxIt.git"
