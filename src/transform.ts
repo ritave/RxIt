@@ -28,10 +28,22 @@ export const sort = <V>(cmp?: (a: V, b: V) => number) =>
  * @param fn - Mapping function.
  * @returns An iterator with each value mapped using `fn`.
  */
-export const map = <V, R>(fn: (input: V) => R) =>
+export const map = <V, R>(fn: (input: V, index: number) => R) =>
   function* (it: Iterable<V>) {
+    let i = 0;
     for (const el of it) {
-      yield fn(el);
+      yield fn(el, i);
+      i += 1;
+    }
+  };
+
+export const flatMap = <A, T>(map: (value: A, index: number) => Iterable<T>) =>
+  function* (it: Iterable<A>) {
+    let i = 0;
+    for (const el of it) {
+      const subIt = map(el, i);
+      yield* subIt;
+      i += 1;
     }
   };
 

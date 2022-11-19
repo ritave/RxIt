@@ -1,9 +1,11 @@
 import { pipe } from './pipe';
 import { unwrap } from './sink';
+import { range } from './source';
 import {
   buffer,
   bufferToggle,
   filter,
+  flatMap,
   map,
   reduce,
   skip,
@@ -35,6 +37,25 @@ describe('map', () => {
     expect([...map((value: number) => value * 2)([1, 2, 3])]).toStrictEqual([
       2, 4, 6,
     ]);
+  });
+});
+
+describe('flatMap', () => {
+  it('flattens', () => {
+    const mapping = jest.fn((value: number) => range(value, value));
+    expect([...flatMap(mapping)([2, 3, 4])]).toStrictEqual([
+      // 2
+      2, 3,
+      // 3
+      3, 4, 5,
+      // 4
+      4, 5, 6, 7,
+    ]);
+
+    expect(mapping).toHaveBeenCalledTimes(3);
+    expect(mapping).toHaveBeenNthCalledWith(1, 2, 0);
+    expect(mapping).toHaveBeenNthCalledWith(2, 3, 1);
+    expect(mapping).toHaveBeenNthCalledWith(3, 4, 2);
   });
 });
 
