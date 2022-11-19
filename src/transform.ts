@@ -234,6 +234,21 @@ export function reduce<A, U>(...args: [ReduceFn<A, U>] | [ReduceFn<A, A>, A]) {
   };
 }
 
+export type BufferClose<A> = (value: A, index: number, buffer: A[]) => boolean;
+/**
+ * Takes an iterator, gathers all elements into an array and emits that array.
+ *
+ * ```text
+ * -2----3--4------5--|>
+ * buffer(x => x % 2 == 0)
+ * -[2]-----[3, 4]----[5]-|>
+ * ```
+ *
+ * @returns An iterator with single element array with all upstream values.
+ */
+export function buffer<A>(
+  close: BufferClose<A>,
+): (it: Iterable<A>) => Iterable<A[]>;
 /**
  * Takes an iterator, gathers all elements into an array and emits that array.
  *
@@ -245,11 +260,73 @@ export function reduce<A, U>(...args: [ReduceFn<A, U>] | [ReduceFn<A, A>, A]) {
  *
  * @returns An iterator with single element array with all upstream values.
  */
-export const buffer = () =>
-  function* <A>(it: Iterable<A>) {
-    const acc: A[] = [];
+export function buffer(): <A>(it: Iterable<A>) => Iterable<A[]>;
+export function buffer<A>(close: BufferClose<A> = () => false) {
+  return function* (it: Iterable<A>) {
+    let state: A[] = [];
+    let i = 0;
+
     for (const el of it) {
-      acc.push(el);
+      state = state.concat([el]);
+      if (close(el, i, state)) {
+        yield state;
+        state = [];
+      }
+      i += 1;
     }
-    yield acc;
+
+    if (state.length) {
+      yield state;
+    }
+  };
+}
+
+export type BufferOpen<A> = (
+  value: A,
+  index: number,
+) => boolean | BufferClose<A>;
+export const bufferToggle = <A>(open: BufferOpen<A>) =>
+  function* (it: Iterable<A>) {
+    type Buffer = { state: A[]; close: BufferClose<A> };
+    let buffers: (Buffer | null)[] = [];
+    let i = 0;
+
+    for (const el of it) {
+      const shouldOpen = open(el, i);
+
+      if (shouldOpen !== false) {
+        let close: BufferClose<A>;
+        if (shouldOpen === true) {
+          close = () => false;
+        } else {
+          close = shouldOpen;
+        }
+        buffers.push({ state: [], close });
+      }
+      for (let j = 0; j < buffers.length; j++) {
+        const buffer = buffers[j] as Buffer | null;
+
+        if (buffer !== null) {
+          buffer.state = buffer.state.concat([el]);
+
+          if (buffer.close(el, i, buffer.state)) {
+            buffers[j] = null;
+            yield buffer.state;
+          }
+        }
+      }
+
+      i += 1;
+      while (buffers[0] === null) {
+        buffers.shift();
+      }
+    }
+
+    if (buffers.length) {
+      for (const buffer of buffers) {
+        if (buffer !== null) {
+          yield buffer.state;
+        }
+      }
+    }
   };

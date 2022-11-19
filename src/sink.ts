@@ -32,7 +32,11 @@ export const forEach = <A>(effect: (input: A, index: number) => void) =>
  */
 export const unwrap = () =>
   function <A>(it: Iterable<A>) {
-    return [...buffer()(it)][0];
+    const result = [...buffer()(it)];
+    if (result.length === 0) {
+      throw new TypeError('No values to unwrap.');
+    }
+    return result[0];
   };
 
 /**
@@ -104,9 +108,6 @@ export function unwrapReduce<A, U>(
       /* c8 ignore end */
     }
 
-    if (reduced!.length !== 1) {
-      throw new TypeError('Reduce with no initial value and empty upstream.');
-    }
     return reduced![0];
   };
 }

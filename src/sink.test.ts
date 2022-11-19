@@ -12,8 +12,8 @@ describe('forEach', () => {
 });
 
 describe('unwrap', () => {
-  it('returns empty array on empty upstream', () => {
-    expect(unwrap()([])).toStrictEqual([]);
+  it('throws on empty upstream', () => {
+    expect(() => unwrap()([])).toThrow(new TypeError('No values to unwrap.'));
   });
 
   it('unwraps', () => {
@@ -37,7 +37,7 @@ describe('unwrapReduce', () => {
   it('throws on empty upstream and no initial value', () => {
     const fn = jest.fn();
     expect(() => unwrapReduce(fn)([])).toThrow(
-      new TypeError('Reduce with no initial value and empty upstream.'),
+      new TypeError('No values to unwrap.'),
     );
     expect(fn).not.toHaveBeenCalled();
   });

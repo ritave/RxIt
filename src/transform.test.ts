@@ -2,6 +2,7 @@ import { pipe } from './pipe';
 import { unwrap } from './sink';
 import {
   buffer,
+  bufferToggle,
   filter,
   map,
   reduce,
@@ -178,11 +179,89 @@ describe('reduce', () => {
 });
 
 describe('buffer', () => {
-  it('returns empty array on empty upstream', () => {
-    expect([...buffer()([])]).toStrictEqual([[]]);
+  it('returns nothing array on empty upstream', () => {
+    expect([...buffer()([])]).toStrictEqual([]);
   });
 
   it('buffers', () => {
     expect([...buffer()([3, 2, 1])]).toStrictEqual([[3, 2, 1]]);
+  });
+
+  it('closes on `close` function', () => {
+    const close = jest.fn((val: number) => val % 2 === 0);
+    expect([...buffer(close)([2, 3, 4, 5])]).toStrictEqual([[2], [3, 4], [5]]);
+
+    expect(close).toHaveBeenCalledTimes(4);
+    expect(close).toHaveBeenNthCalledWith(1, 2, 0, [2]);
+    expect(close).toHaveBeenNthCalledWith(2, 3, 1, [3]);
+    expect(close).toHaveBeenNthCalledWith(3, 4, 2, [3, 4]);
+    expect(close).toHaveBeenNthCalledWith(4, 5, 3, [5]);
+  });
+});
+
+describe('bufferToggle', () => {
+  it('maintains buffers', () => {
+    const closes: jest.Mock[] = [];
+    // opens buffers on all elements
+    // and closes them after opening-index count elements are inside
+    const open = jest.fn((_open: number, openIndex: number) => {
+      const close = jest.fn(
+        (_close: number, closeIndex: number) =>
+          closeIndex - openIndex === openIndex,
+      );
+      closes.push(close);
+      return close;
+    });
+
+    expect([...bufferToggle(open)([2, 3, 4, 5])]).toStrictEqual([
+      [2],
+      [3, 4],
+      [4, 5],
+      [5],
+    ]);
+
+    expect(open).toHaveBeenCalledTimes(4);
+    expect(open).toHaveBeenNthCalledWith(1, 2, 0);
+    expect(open).toHaveBeenNthCalledWith(2, 3, 1);
+    expect(open).toHaveBeenNthCalledWith(3, 4, 2);
+    expect(open).toHaveBeenNthCalledWith(4, 5, 3);
+
+    expect(closes).toHaveLength(4);
+
+    expect(closes[0]).toHaveBeenCalledTimes(1);
+    expect(closes[0]).toHaveBeenNthCalledWith(1, 2, 0, [2]);
+
+    expect(closes[1]).toHaveBeenCalledTimes(2);
+    expect(closes[1]).toHaveBeenNthCalledWith(1, 3, 1, [3]);
+    expect(closes[1]).toHaveBeenNthCalledWith(2, 4, 2, [3, 4]);
+
+    expect(closes[2]).toHaveBeenCalledTimes(2);
+    expect(closes[2]).toHaveBeenNthCalledWith(1, 4, 2, [4]);
+    expect(closes[2]).toHaveBeenNthCalledWith(2, 5, 3, [4, 5]);
+
+    expect(closes[3]).toHaveBeenCalledTimes(1);
+    expect(closes[3]).toHaveBeenNthCalledWith(1, 5, 3, [5]);
+  });
+
+  it('opens buffers only when instructed', () => {
+    const open = (val: number) => val % 2 === 0;
+    expect([...bufferToggle(open)([2, 3, 4, 5, 6])]).toStrictEqual([
+      [2, 3, 4, 5, 6],
+      [4, 5, 6],
+      [6],
+    ]);
+  });
+
+  it("doesn't open buffers on false", () => {
+    expect([...bufferToggle(() => false)([2, 3, 4, 5])]).toStrictEqual([]);
+  });
+
+  it('opens infinite buffer on true', () => {
+    expect([...bufferToggle(() => true)([2, 3, 4, 5])]).toStrictEqual([
+      [2, 3, 4, 5],
+      [3, 4, 5],
+      [4, 5],
+      [5],
+    ]);
   });
 });
