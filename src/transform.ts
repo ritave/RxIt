@@ -25,23 +25,25 @@ export const sort = <V>(cmp?: (a: V, b: V) => number) =>
  * -4--6--8-|>
  * ```
  *
- * @param fn - Mapping function.
+ * @param mapping - Mapping function.
  * @returns An iterator with each value mapped using `fn`.
  */
-export const map = <V, R>(fn: (input: V, index: number) => R) =>
+export const map = <V, R>(mapping: (input: V, index: number) => R) =>
   function* (it: Iterable<V>) {
     let i = 0;
     for (const el of it) {
-      yield fn(el, i);
+      yield mapping(el, i);
       i += 1;
     }
   };
 
-export const flatMap = <A, T>(map: (value: A, index: number) => Iterable<T>) =>
+export const flatMap = <A, T>(
+  mapping: (value: A, index: number) => Iterable<T>,
+) =>
   function* (it: Iterable<A>) {
     let i = 0;
     for (const el of it) {
-      const subIt = map(el, i);
+      const subIt = mapping(el, i);
       yield* subIt;
       i += 1;
     }
@@ -93,23 +95,6 @@ export const filter = <A>(predicate: (el: A, index: number) => boolean) =>
   };
 
 /**
- * Takes up-to `count` elements from the upstream iterator and emits them.
- *
- * ```text
- * -2--3--4--5-|>
- * take(2)
- * -2--3-|>
- * ```
- *
- * @param count - The number of elements to take from the iterator.
- * @returns An iterator with up-to `count` elements.
- */
-export const take =
-  (count = 1) =>
-  <A>(it: Iterable<A>) =>
-    takeWhile<A>((_, index) => index < count)(it);
-
-/**
  * Takes values from upstream as long as `predicate` holds. After it stops taking, finished immediately.
  *
  * ```text
@@ -136,21 +121,21 @@ export const takeWhile = <A>(
   };
 
 /**
- * Skips first `count` elements from the upstream iterator and emits the rest.
+ * Takes up-to `count` elements from the upstream iterator and emits them.
  *
  * ```text
- * -2--3--4--5--6-|>
- * skip(2)
- * -------4--5--6-|>
+ * -2--3--4--5-|>
+ * take(2)
+ * -2--3-|>
  * ```
  *
- * @param count - The number of elements to skip from the upstream.
- * @returns An iterator with first `count` elements skipped.
+ * @param count - The number of elements to take from the iterator.
+ * @returns An iterator with up-to `count` elements.
  */
-export const skip =
+export const take =
   (count = 1) =>
   <A>(it: Iterable<A>) =>
-    skipWhile<A>((_, index) => index < count)(it);
+    takeWhile<A>((_, index) => index < count)(it);
 
 /**
  * Skips values from upstream as long as `predicate` holds. After it stops holding, returns the rest of the values.
@@ -182,6 +167,23 @@ export const skipWhile = <A>(
       i += 1;
     }
   };
+
+/**
+ * Skips first `count` elements from the upstream iterator and emits the rest.
+ *
+ * ```text
+ * -2--3--4--5--6-|>
+ * skip(2)
+ * -------4--5--6-|>
+ * ```
+ *
+ * @param count - The number of elements to skip from the upstream.
+ * @returns An iterator with first `count` elements skipped.
+ */
+export const skip =
+  (count = 1) =>
+  <A>(it: Iterable<A>) =>
+    skipWhile<A>((_, index) => index < count)(it);
 
 export type ReduceFn<A, U> = (acc: U, curr: A) => U;
 const unused = Symbol('No value was set');
@@ -256,6 +258,7 @@ export type BufferClose<A> = (value: A, index: number, buffer: A[]) => boolean;
  * -[2]-----[3, 4]----[5]-|>
  * ```
  *
+ * @param close - A predicate that closes and emits the buffer on `true`.
  * @returns An iterator with single element array with all upstream values.
  */
 export function buffer<A>(
@@ -273,6 +276,7 @@ export function buffer<A>(
  * @returns An iterator with single element array with all upstream values.
  */
 export function buffer(): <A>(it: Iterable<A>) => Iterable<A[]>;
+// eslint-disable-next-line jsdoc/require-jsdoc
 export function buffer<A>(close: BufferClose<A> = () => false) {
   return function* (it: Iterable<A>) {
     let state: A[] = [];
@@ -300,7 +304,7 @@ export type BufferOpen<A> = (
 export const bufferToggle = <A>(open: BufferOpen<A>) =>
   function* (it: Iterable<A>) {
     type Buffer = { state: A[]; close: BufferClose<A> };
-    let buffers: (Buffer | null)[] = [];
+    const buffers: (Buffer | null)[] = [];
     let i = 0;
 
     for (const el of it) {
@@ -315,15 +319,16 @@ export const bufferToggle = <A>(open: BufferOpen<A>) =>
         }
         buffers.push({ state: [], close });
       }
+
       for (let j = 0; j < buffers.length; j++) {
-        const buffer = buffers[j] as Buffer | null;
+        const subBuffer = buffers[j] as Buffer | null;
 
-        if (buffer !== null) {
-          buffer.state = buffer.state.concat([el]);
+        if (subBuffer !== null) {
+          subBuffer.state = subBuffer.state.concat([el]);
 
-          if (buffer.close(el, i, buffer.state)) {
+          if (subBuffer.close(el, i, subBuffer.state)) {
             buffers[j] = null;
-            yield buffer.state;
+            yield subBuffer.state;
           }
         }
       }
@@ -335,9 +340,9 @@ export const bufferToggle = <A>(open: BufferOpen<A>) =>
     }
 
     if (buffers.length) {
-      for (const buffer of buffers) {
-        if (buffer !== null) {
-          yield buffer.state;
+      for (const subBuffer of buffers) {
+        if (subBuffer !== null) {
+          yield subBuffer.state;
         }
       }
     }

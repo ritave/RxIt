@@ -7,9 +7,8 @@ import { buffer, reduce, ReduceFn } from './transform';
  * ```
  * pipe([1, 2, 3], map(x => x * 2), forEach(console.log))
  * ```
- *
  * @param effect - The function call on each upstream value.
- * @returns Nothing, consumes the upstream iterator
+ * @returns Nothing, consumes the upstream iterator.
  */
 export const forEach = <A>(effect: (input: A, index: number) => void) =>
   function (it: Iterable<A>) {
@@ -108,6 +107,10 @@ export function unwrapReduce<A, U>(
       /* c8 ignore end */
     }
 
-    return reduced![0];
+    if (reduced === undefined || reduced.length !== 1) {
+      throw new Error('Internal Error: unwrapReduce assumptions wrong.');
+    }
+
+    return reduced[0];
   };
 }
