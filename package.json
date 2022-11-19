@@ -4,7 +4,7 @@
   "description": "Reactive iterators for JavaScript.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ritave/RxIt.git"
+    "url": "https://github.com/ritave/RxIter.git"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
