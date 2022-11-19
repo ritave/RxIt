@@ -4687,9 +4687,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxit@workspace:.":
+"rxiter@workspace:.":
   version: 0.0.0-use.local
-  resolution: "rxit@workspace:."
+  resolution: "rxiter@workspace:."
   dependencies:
     "@metamask/auto-changelog": ^2.3.0
     "@metamask/eslint-config": ^11.0.1
