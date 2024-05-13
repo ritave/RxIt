@@ -5,6 +5,7 @@ import {
   buffer,
   bufferToggle,
   filter,
+  find,
   flatMap,
   map,
   reduce,
@@ -72,6 +73,24 @@ describe('tap', () => {
   it('ignores return value', () => {
     const fn = jest.fn(() => 42);
     expect([...tap(fn)([1, 2, 3])]).toStrictEqual([1, 2, 3]);
+  });
+});
+
+describe('find', () => {
+  it('returns nothing on always false', () => {
+    expect([...find(() => false)([1, 2, 3])]).toStrictEqual([]);
+  });
+
+  it('returns first found value', () => {
+    expect([
+      ...find((val: number) => val % 2 === 0)([1, 3, 5, 6, 3, 1]),
+    ]).toStrictEqual([6]);
+  });
+
+  it('returns only first value', () => {
+    expect([
+      ...find((val: number) => val % 5 === 0)([1, 2, 3, 5, 6, 10, 15, 20]),
+    ]).toStrictEqual([5]);
   });
 });
 

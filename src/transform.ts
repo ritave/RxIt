@@ -107,6 +107,29 @@ export const filter = <A>(predicate: (el: A, index: number) => boolean) =>
   };
 
 /**
+ * Emits only the first value that satisfies the predicate.
+ *
+ * ```text
+ * --1--3--6--5--9--10-|>
+ * find(x => x % 5 === 0)
+ * -----------5-|>
+ * ```
+ *
+ * @param predicate - A test function called on each value.
+ * @returns An iterator with a single found value.
+ */
+export const find = <A>(predicate: (el: A, index: number) => boolean) =>
+  function* (it: Iterable<A>) {
+    const i = 0;
+    for (const el of it) {
+      if (predicate(el, i)) {
+        yield el;
+        return;
+      }
+    }
+  };
+
+/**
  * Takes values from upstream as long as `predicate` holds. After it stops taking, finished immediately.
  *
  * ```text
