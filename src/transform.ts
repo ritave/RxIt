@@ -21,6 +21,28 @@ export const distinct = <V>() =>
   };
 
 /**
+ * Takes an iterator, emits only values that are distinct from the last previous value.
+ *
+ * ```text
+ * -1--1--2--1--2--3--3--1--4--4--4-|>
+ * distinct()
+ * -1-----2--1--2--3-----1--4-------|>
+ * ```
+ *
+ * @returns An iterator that emits only distinct values.
+ */
+export const distinctUntilChanged = <V>() =>
+  function* (it: Iterable<V>) {
+    let last: V | symbol = Symbol('No last value yet');
+    for (const el of it) {
+      if (el !== last) {
+        last = el;
+        yield el;
+      }
+    }
+  };
+
+/**
  * Takes an iterator, gathers all upstream values, sorts them and emits them in sorted order.
  *
  * ```text

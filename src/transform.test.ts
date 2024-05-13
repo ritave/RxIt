@@ -5,6 +5,7 @@ import {
   buffer,
   bufferToggle,
   distinct,
+  distinctUntilChanged,
   filter,
   find,
   flatMap,
@@ -23,6 +24,14 @@ describe('distinct', () => {
     expect([
       ...distinct()([1, 1, 2, 2, 1, 3, 2, 1, 2, 3, 4, 1, 2, 3, 4]),
     ]).toStrictEqual([1, 2, 3, 4]);
+  });
+});
+
+describe('distinctUntilChanged', () => {
+  it('emits unique values', () => {
+    expect([
+      ...distinctUntilChanged()([1, 1, 2, 1, 2, 3, 3, 1, 4, 4, 4]),
+    ]).toStrictEqual([1, 2, 1, 2, 3, 1, 4]);
   });
 });
 
