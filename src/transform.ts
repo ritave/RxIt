@@ -37,6 +37,18 @@ export const map = <V, R>(mapping: (input: V, index: number) => R) =>
     }
   };
 
+/**
+ * Takes an iterator, emits values from iterators returned from `mapping` function.
+ *
+ * ```text
+ * -1--2----3------4-|>
+ * flatMap(x => range(1, x))
+ * -1--1-2--1-2-3--1-2-3-4-|>
+ * ```
+ *
+ * @param mapping - A function that maps an original value to a new iterator.
+ * @returns An iterator that yields values from all `mapping` calls.
+ */
 export const flatMap = <A, T>(
   mapping: (value: A, index: number) => Iterable<T>,
 ) =>
@@ -253,9 +265,9 @@ export type BufferClose<A> = (value: A, index: number, buffer: A[]) => boolean;
  * Takes an iterator, gathers all elements into an array and emits that array.
  *
  * ```text
- * -2----3--4------5--|>
+ * -2----3--4------5-|>
  * buffer(x => x % 2 == 0)
- * -[2]-----[3, 4]----[5]-|>
+ * -[2]-----[3, 4]---[5]-|>
  * ```
  *
  * @param close - A predicate that closes and emits the buffer on `true`.
@@ -270,7 +282,7 @@ export function buffer<A>(
  * ```text
  * -2--3--4--5-|>
  * buffer()
- * ------------[2,3,4,5]--|>
+ * ------------[2,3,4,5]-|>
  * ```
  *
  * @returns An iterator with single element array with all upstream values.
@@ -301,6 +313,24 @@ export type BufferOpen<A> = (
   value: A,
   index: number,
 ) => boolean | BufferClose<A>;
+/**
+ * Takes an iterator, opens buffers when `open` returns `true` or returns a `close` function, and emits them when `close` returns `true`.
+ *
+ * ```text
+ * -1--2--3--4--5--6-|>
+ * bufferToggle(x => x % 2 === 1)
+ * ------------------[1,2,3,4,5,6][3,4,5,6][5,6]-|>
+ * ```
+ *
+ * ```text
+ * -1--2------3--4-----5-|>
+ * bufferToggle(x => x % 2 === 1 ? (y => y % 2 === 0) : false)
+ * ----[1,2]-----[3,4]---[5]-|>
+ * ```
+ *
+ * @param open - A function that does nothing on `false`, opens a buffer otherwise. Closes the buffer when a function returned from `open` returns `true`.
+ * @returns An iterator with values grouped into arrays by the `open` function.
+ */
 export const bufferToggle = <A>(open: BufferOpen<A>) =>
   function* (it: Iterable<A>) {
     type Buffer = { state: A[]; close: BufferClose<A> };

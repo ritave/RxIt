@@ -61,6 +61,11 @@ export const unwrapFirst = () =>
 /**
  * Takes an iterator, reduces it's values using standard semantics of array.reduce and returns a single value.
  *
+ * @example
+ * ```typescript
+ * pipe([1, 2, 3], map(v => v * 2), unwrapReduce((acc, x) => acc + x))
+ * // returns "12"
+ * ```
  * @throws {@link TypeError}. In case the upstream was empty.
  * @param fn - Standard array.reduce reducer.
  * @returns Single reduced value.
@@ -69,6 +74,11 @@ export function unwrapReduce<A>(fn: ReduceFn<A, A>): (_: Iterable<A>) => A;
 /**
  * Takes an iterator, reduces it's values using standard semantics of array.reduce and returns a single value.
  *
+ * @example
+ * ```typescript
+ * pipe([1, 2, 3], map(v => v * 2), unwrapReduce((acc, x) => acc + x, 30))
+ * // returns "42"
+ * ```
  * @throws {@link TypeError}. In case the upstream was empty.
  * @param fn - Standard array.reduce reducer.
  * @param initial - Initial value passed down to `fn` as accumulator.

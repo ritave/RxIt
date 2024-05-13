@@ -273,6 +273,21 @@ describe('bufferToggle', () => {
     ]);
   });
 
+  it('opens buffers and closes them', () => {
+    const open = (val: number) => {
+      if (val % 2 === 1) {
+        return (closeVal: number) => closeVal % 2 === 0;
+      }
+      return false;
+    };
+
+    expect([...bufferToggle(open)([1, 2, 3, 4, 5])]).toStrictEqual([
+      [1, 2],
+      [3, 4],
+      [5],
+    ]);
+  });
+
   it("doesn't open buffers on false", () => {
     expect([...bufferToggle(() => false)([2, 3, 4, 5])]).toStrictEqual([]);
   });
