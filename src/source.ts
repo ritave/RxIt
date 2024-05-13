@@ -97,3 +97,13 @@ export function* generate<A, T>(
 export function* just<A>(value: A): Iterable<A> {
   yield value;
 }
+
+/**
+ * Converts parameters into iterator.
+ *
+ * @param values - Values to emit.
+ * @yields `values`.
+ */
+export function* of<A>(...values: A[]): Iterable<A> {
+  yield* values;
+}

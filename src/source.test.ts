@@ -1,4 +1,4 @@
-import { empty, generate, just, range } from './source';
+import { empty, generate, just, of, range } from './source';
 import { take } from './transform';
 
 describe('empty', () => {
@@ -82,5 +82,19 @@ describe('just', () => {
 
   it("doesn't unroll", () => {
     expect([...just([1, 2, 3])]).toStrictEqual([[1, 2, 3]]);
+  });
+});
+
+describe('of', () => {
+  it('emits values', () => {
+    expect([...of(1, 2, 3)]).toStrictEqual([1, 2, 3]);
+  });
+
+  it("doesn't unroll", () => {
+    expect([...of<number | number[]>(1, [1, 2], [3, 4])]).toStrictEqual([
+      1,
+      [1, 2],
+      [3, 4],
+    ]);
   });
 });
