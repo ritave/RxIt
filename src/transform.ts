@@ -1,4 +1,26 @@
 /**
+ * Takes an iterator, emits only values that are distinct from all other previous values
+ *
+ * ```text
+ * -1--1--2--1--2--3--2--1--4--3--2-|>
+ * distinct()
+ * -1-----2--------3--------4-------|>
+ * ```
+ *
+ * @returns An iterator that emits only distinct values.
+ */
+export const distinct = <V>() =>
+  function* (it: Iterable<V>) {
+    const hasSeen = new Set();
+    for (const el of it) {
+      if (!hasSeen.has(el)) {
+        hasSeen.add(el);
+        yield el;
+      }
+    }
+  };
+
+/**
  * Takes an iterator, gathers all upstream values, sorts them and emits them in sorted order.
  *
  * ```text

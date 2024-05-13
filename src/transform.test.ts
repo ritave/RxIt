@@ -4,6 +4,7 @@ import { range } from './source';
 import {
   buffer,
   bufferToggle,
+  distinct,
   filter,
   find,
   flatMap,
@@ -16,6 +17,14 @@ import {
   takeWhile,
   tap,
 } from './transform';
+
+describe('distinct', () => {
+  it('emits unique values', () => {
+    expect([
+      ...distinct()([1, 1, 2, 2, 1, 3, 2, 1, 2, 3, 4, 1, 2, 3, 4]),
+    ]).toStrictEqual([1, 2, 3, 4]);
+  });
+});
 
 describe('sort', () => {
   it('sorts', () => {
