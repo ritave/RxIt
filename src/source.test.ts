@@ -1,5 +1,11 @@
-import { generate, just, range } from './source';
+import { empty, generate, just, range } from './source';
 import { take } from './transform';
+
+describe('empty', () => {
+  it('returns empty iterator', () => {
+    expect([...empty()]).toStrictEqual([]);
+  });
+});
 
 describe('range', () => {
   it('starts from `start`', () => {

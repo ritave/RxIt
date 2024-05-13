@@ -1,4 +1,13 @@
 /**
+ * Create an iterator with no values that completes immediately.
+ *
+ * @returns An empty iterator.
+ */
+export function* empty() {
+  /* empty */
+}
+
+/**
  * Creates an iterator that emits values from `start` indefinitely.
  *
  * ```text
