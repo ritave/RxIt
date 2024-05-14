@@ -1,3 +1,5 @@
+import assert from 'assert';
+
 import { pipe } from './pipe';
 import { unwrap } from './sink';
 import { range } from './source';
@@ -98,6 +100,23 @@ describe('distinctUntilChanged', () => {
       ['2', 3],
       [3, 4],
     ]);
+  });
+
+  it("doesn't pass symbol to comparator", () => {
+    expect(() => [
+      ...distinctUntilChanged((a, b) => {
+        assert(typeof a !== 'symbol' && typeof b !== 'symbol');
+        assert(
+          typeof a === 'number' &&
+            typeof b === 'number' &&
+            a >= 1 &&
+            a <= 3 &&
+            b >= 1 &&
+            b <= 3,
+        );
+        return a === b;
+      })([1, 1, 2, 3, 1, 2, 3]),
+    ]).not.toThrow();
   });
 });
 

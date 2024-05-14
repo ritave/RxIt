@@ -35,15 +35,16 @@ export const distinct = <V>(keySelector: (val: V) => any = (val) => val) =>
  * @param keySelector - An optional function that chooses a key to compare distinctness of elements with. Defaults to identity.
  * @returns An iterator that emits only distinct values.
  */
+const noValue = Symbol('No value');
 export const distinctUntilChanged = <V, K = V>(
   comparator: (a: K, b: K) => boolean = (a, b) => a === b,
   keySelector: (val: V) => K = (val) => val as any,
 ) =>
   function* (it: Iterable<V>) {
-    let last: any | symbol = Symbol('No last value yet');
+    let last: K | typeof noValue = noValue;
     for (const el of it) {
       const key = keySelector(el);
-      if (!comparator(last, key)) {
+      if (last === noValue || !comparator(last, key)) {
         last = key;
         yield el;
       }

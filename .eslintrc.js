@@ -23,5 +23,7 @@ module.exports = {
     },
   ],
 
+  rules: { 'import/no-nodejs-modules': 0 },
+
   ignorePatterns: ['!.eslintrc.js', '!.prettierrc.js', 'dist/', 'docs/'],
 };
