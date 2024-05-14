@@ -58,6 +58,31 @@ export const unwrapFirst = () =>
     return next.value;
   };
 
+const noValue = Symbol('No value');
+/**
+ * Takes an iterator and returns the last element.
+ *
+ * @example
+ * ```typescript
+ * pipe([1, 2, 3], map(v => v * 2), unwrapFirst());
+ * // returns "6"
+ * ```
+ * @throws {@link TypeError}. IN case the upstream was empty.
+ * @returns The last element returned by the iterator.
+ */
+export const unwrapLast = () =>
+  function <A>(it: Iterable<A>) {
+    let last: A | typeof noValue = noValue;
+    for (const el of it) {
+      last = el;
+    }
+
+    if (last === noValue) {
+      throw new TypeError('Tried to unwrap last element from empty iterator.');
+    }
+    return last;
+  };
+
 /**
  * Takes an iterator, reduces it's values using standard semantics of array.reduce and returns a single value.
  *

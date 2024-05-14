@@ -1,4 +1,4 @@
-import { forEach, unwrap, unwrapFirst, unwrapReduce } from './sink';
+import { forEach, unwrap, unwrapFirst, unwrapLast, unwrapReduce } from './sink';
 
 describe('forEach', () => {
   it('calls the effect', () => {
@@ -30,6 +30,18 @@ describe('unwrapFirst', () => {
 
   it('returns first element', () => {
     expect(unwrapFirst()([42, 1, 2, 3])).toBe(42);
+  });
+});
+
+describe('unwrapLast', () => {
+  it('throws on empty upstream', () => {
+    expect(() => unwrapLast()([])).toThrow(
+      new TypeError('Tried to unwrap last element from empty iterator.'),
+    );
+  });
+
+  it('returns last element', () => {
+    expect(unwrapLast()([1, 2, 3, 42])).toBe(42);
   });
 });
 
