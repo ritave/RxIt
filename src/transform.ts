@@ -336,6 +336,41 @@ export function reduce<A, U>(...args: [ReduceFn<A, U>] | [ReduceFn<A, A>, A]) {
   };
 }
 
+/**
+ * Stores and re-emits the upstream sequence of emissions `count` times.
+ *
+ * ```text
+ * -1--2--3-|>
+ * repeat(3)
+ * -1--2--3--1--2--3--1--2--3-|>
+ * ```
+ *
+ * @param count - The number of times to repeat the sequence. Infinite times if undefined.
+ * @returns An iterator repeating the sequence of emissions.
+ */
+export function repeat(count?: number) {
+  return function* <V>(iterator: Iterable<V>) {
+    const values = [];
+    if (count === 0) {
+      return;
+    }
+
+    for (const el of iterator) {
+      values.push(el);
+      yield el;
+    }
+
+    // Notice that it's infinite if the number is negative
+    for (
+      let currentCount = count ? count - 1 : -1;
+      currentCount !== 0;
+      currentCount--
+    ) {
+      yield* values;
+    }
+  };
+}
+
 export type BufferClose<A> = (value: A, index: number, buffer: A[]) => boolean;
 /**
  * Takes an iterator, gathers all elements into an array and emits that array.

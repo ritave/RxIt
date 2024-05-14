@@ -13,6 +13,7 @@ import {
   flatMap,
   map,
   reduce,
+  repeat,
   skip,
   skipWhile,
   sort,
@@ -318,6 +319,22 @@ describe('reduce', () => {
     const sum = jest.fn((acc: number, val: number) => acc + val);
     expect([...reduce(sum, 42)([1, 2, 3])]).toStrictEqual([48]);
     expect(sum).toHaveBeenNthCalledWith(1, 42, 1);
+  });
+});
+
+describe('repeat', () => {
+  it('repeats count times', () => {
+    expect([...repeat(3)([1, 2, 3])]).toStrictEqual([
+      1, 2, 3, 1, 2, 3, 1, 2, 3,
+    ]);
+  });
+
+  it('repeats infinitely on undefined count', () => {
+    expect([...take(7)(repeat()([1, 2]))]).toStrictEqual([1, 2, 1, 2, 1, 2, 1]);
+  });
+
+  it("doesn't repeat on zero count", () => {
+    expect([...repeat(0)([1, 2, 3])]).toStrictEqual([]);
   });
 });
 
