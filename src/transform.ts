@@ -273,6 +273,25 @@ export const skip =
   <A>(it: Iterable<A>) =>
     skipWhile<A>((_, index) => index < count)(it);
 
+/**
+ * Emits `values` before emitting from upstream.
+ *
+ * ```text
+ * -1--2--3
+ * startWith(4, 5, 6)
+ * -4--5--6--1--2--3-|>
+ * ```
+ *
+ * @param values - Values to prepend before upstream emissions.
+ * @returns An iterator with `values` prepended.
+ */
+export function startWith<V, K>(...values: V[]) {
+  return function* (it: Iterable<K>) {
+    yield* values;
+    yield* it;
+  };
+}
+
 export type ReduceFn<A, U> = (acc: U, curr: A) => U;
 const unused = Symbol('No value was set');
 /**

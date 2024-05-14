@@ -17,6 +17,7 @@ import {
   skip,
   skipWhile,
   sort,
+  startWith,
   take,
   takeWhile,
   tap,
@@ -335,6 +336,14 @@ describe('repeat', () => {
 
   it("doesn't repeat on zero count", () => {
     expect([...repeat(0)([1, 2, 3])]).toStrictEqual([]);
+  });
+});
+
+describe('startWith', () => {
+  it('prepends before emitting', () => {
+    expect([...startWith(4, 5, 6)([1, 2, 3])]).toStrictEqual([
+      4, 5, 6, 1, 2, 3,
+    ]);
   });
 });
 
