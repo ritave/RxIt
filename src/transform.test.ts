@@ -25,6 +25,24 @@ describe('distinct', () => {
       ...distinct()([1, 1, 2, 2, 1, 3, 2, 1, 2, 3, 4, 1, 2, 3, 4]),
     ]).toStrictEqual([1, 2, 3, 4]);
   });
+
+  it('uses key function', () => {
+    expect([
+      ...distinct<[number, number]>(([first]) => first)([
+        [1, 2],
+        [1, 3],
+        [1, 4],
+        [2, 1],
+        [2, 2],
+        [3, 4],
+        [3, 1],
+      ]),
+    ]).toStrictEqual([
+      [1, 2],
+      [2, 1],
+      [3, 4],
+    ]);
+  });
 });
 
 describe('distinctUntilChanged', () => {
@@ -32,6 +50,54 @@ describe('distinctUntilChanged', () => {
     expect([
       ...distinctUntilChanged()([1, 1, 2, 1, 2, 3, 3, 1, 4, 4, 4]),
     ]).toStrictEqual([1, 2, 1, 2, 3, 1, 4]);
+  });
+
+  it('uses comparator', () => {
+    expect([
+      ...distinctUntilChanged<number | string>(
+        (a, b) => a.toString() === b.toString(),
+      )([1, '1', '2', 2, '1']),
+    ]).toStrictEqual([1, '2', '1']);
+  });
+
+  it('uses key selector', () => {
+    expect([
+      ...distinctUntilChanged<[number, number], number>(
+        undefined,
+        ([first]) => first,
+      )([
+        [1, 2],
+        [1, 3],
+        [2, 3],
+        [2, 1],
+        [3, 4],
+        [3, 1],
+      ]),
+    ]).toStrictEqual([
+      [1, 2],
+      [2, 3],
+      [3, 4],
+    ]);
+  });
+
+  it('uses key selector and comparator', () => {
+    expect([
+      ...distinctUntilChanged<[number | string, number], number | string>(
+        (a, b) => a.toString() === b.toString(),
+        ([first]) => first,
+      )([
+        [1, 2],
+        ['1', 3],
+        ['2', 3],
+        [2, 1],
+        [3, 4],
+        ['3', 1],
+      ]),
+    ]).toStrictEqual([
+      [1, 2],
+      ['2', 3],
+      [3, 4],
+    ]);
   });
 });
 

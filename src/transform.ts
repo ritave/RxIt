@@ -7,14 +7,16 @@
  * -1-----2--------3--------4-------|>
  * ```
  *
+ * @param keySelector - An optional function that chooses a key to compare distinctness of elements with. Defaults to identity.
  * @returns An iterator that emits only distinct values.
  */
-export const distinct = <V>() =>
+export const distinct = <V>(keySelector: (val: V) => any = (val) => val) =>
   function* (it: Iterable<V>) {
     const hasSeen = new Set();
     for (const el of it) {
-      if (!hasSeen.has(el)) {
-        hasSeen.add(el);
+      const key = keySelector(el);
+      if (!hasSeen.has(key)) {
+        hasSeen.add(key);
         yield el;
       }
     }
@@ -25,18 +27,24 @@ export const distinct = <V>() =>
  *
  * ```text
  * -1--1--2--1--2--3--3--1--4--4--4-|>
- * distinct()
+ * distinctUntilChanged()
  * -1-----2--1--2--3-----1--4-------|>
  * ```
  *
+ * @param comparator - An optional function to compare current and previous values. Defaults to ===.
+ * @param keySelector - An optional function that chooses a key to compare distinctness of elements with. Defaults to identity.
  * @returns An iterator that emits only distinct values.
  */
-export const distinctUntilChanged = <V>() =>
+export const distinctUntilChanged = <V, K = V>(
+  comparator: (a: K, b: K) => boolean = (a, b) => a === b,
+  keySelector: (val: V) => K = (val) => val as any,
+) =>
   function* (it: Iterable<V>) {
-    let last: V | symbol = Symbol('No last value yet');
+    let last: any | symbol = Symbol('No last value yet');
     for (const el of it) {
-      if (el !== last) {
-        last = el;
+      const key = keySelector(el);
+      if (!comparator(last, key)) {
+        last = key;
         yield el;
       }
     }
