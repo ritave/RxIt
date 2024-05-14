@@ -1,4 +1,21 @@
 /**
+ * Emits all values from first iterator then moves to the next one.
+ *
+ * ```text
+ * concat(range(1, 3), (4, 3))
+ * -1-2-3-4-5-6-|>
+ * ```
+ *
+ * @param iterators - Iterators to concat.
+ * @yields Sequential values from the iterators
+ */
+export function* concat<V>(...iterators: Iterable<V>[]): Iterable<V> {
+  for (const iterator of iterators) {
+    yield* iterator;
+  }
+}
+
+/**
  * Create an iterator with no values that completes immediately.
  *
  * @returns An empty iterator.

@@ -1,5 +1,13 @@
-import { empty, generate, just, of, range } from './source';
+import { concat, empty, generate, just, of, range } from './source';
 import { take } from './transform';
+
+describe('concat', () => {
+  it('concatenates', () => {
+    expect([...concat(range(1, 3), range(4, 3), range(7, 3))]).toStrictEqual([
+      1, 2, 3, 4, 5, 6, 7, 8, 9,
+    ]);
+  });
+});
 
 describe('empty', () => {
   it('returns empty iterator', () => {
