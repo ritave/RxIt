@@ -1,4 +1,26 @@
 /**
+ * Counts the number of elements in the upstream iterator.
+ *
+ * ```text
+ * --1--1--1--2--3--4-|>
+ * count()
+ * -------------------6-|>
+ * ```
+ *
+ * @returns The number of elements in the upstream iterator.
+ */
+export function count() {
+  return function* (it: Iterable<unknown>) {
+    let noElements = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const _ of it) {
+      noElements += 1;
+    }
+    yield noElements;
+  };
+}
+
+/**
  * Takes an iterator, emits only values that are distinct from all other previous values
  *
  * ```text
@@ -217,13 +239,13 @@ export const takeWhile = <A>(
  * -2--3-|>
  * ```
  *
- * @param count - The number of elements to take from the iterator.
+ * @param countElements - The number of elements to take from the iterator.
  * @returns An iterator with up-to `count` elements.
  */
 export const take =
-  (count = 1) =>
+  (countElements = 1) =>
   <A>(it: Iterable<A>) =>
-    takeWhile<A>((_, index) => index < count)(it);
+    takeWhile<A>((_, index) => index < countElements)(it);
 
 /**
  * Skips values from upstream as long as `predicate` holds. After it stops holding, returns the rest of the values.
@@ -265,13 +287,13 @@ export const skipWhile = <A>(
  * -------4--5--6-|>
  * ```
  *
- * @param count - The number of elements to skip from the upstream.
+ * @param countSkipped - The number of elements to skip from the upstream.
  * @returns An iterator with first `count` elements skipped.
  */
 export const skip =
-  (count = 1) =>
+  (countSkipped = 1) =>
   <A>(it: Iterable<A>) =>
-    skipWhile<A>((_, index) => index < count)(it);
+    skipWhile<A>((_, index) => index < countSkipped)(it);
 
 /**
  * Emits `values` before emitting from upstream.
@@ -364,13 +386,13 @@ export function reduce<A, U>(...args: [ReduceFn<A, U>] | [ReduceFn<A, A>, A]) {
  * -1--2--3--1--2--3--1--2--3-|>
  * ```
  *
- * @param count - The number of times to repeat the sequence. Infinite times if undefined.
+ * @param countRepeats - The number of times to repeat the sequence. Infinite times if undefined.
  * @returns An iterator repeating the sequence of emissions.
  */
-export function repeat(count?: number) {
+export function repeat(countRepeats?: number) {
   return function* <V>(iterator: Iterable<V>) {
     const values = [];
-    if (count === 0) {
+    if (countRepeats === 0) {
       return;
     }
 
@@ -381,7 +403,7 @@ export function repeat(count?: number) {
 
     // Notice that it's infinite if the number is negative
     for (
-      let currentCount = count ? count - 1 : -1;
+      let currentCount = countRepeats ? countRepeats - 1 : -1;
       currentCount !== 0;
       currentCount--
     ) {

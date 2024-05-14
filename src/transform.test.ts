@@ -6,6 +6,7 @@ import { range } from './source';
 import {
   buffer,
   bufferToggle,
+  count,
   distinct,
   distinctUntilChanged,
   filter,
@@ -22,6 +23,16 @@ import {
   takeWhile,
   tap,
 } from './transform';
+
+describe('count', () => {
+  it('counts elements', () => {
+    expect([...count()([1, 1, 1, 2, 3, 4])]).toStrictEqual([6]);
+  });
+
+  it('returns zero on empty', () => {
+    expect([...count()([])]).toStrictEqual([0]);
+  });
+});
 
 describe('distinct', () => {
   it('emits unique values', () => {
