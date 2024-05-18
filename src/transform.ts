@@ -268,6 +268,25 @@ export const tap = <A>(effect: (input: A, index: number) => void) =>
   };
 
 /**
+ * Re-emits from upstream and calls an effect after the upstream is finished.
+ *
+ * ```text
+ * --1--2--3-|>
+ * finalize(() => console.log("Complete"))
+ * --1--2--3-|>
+ * ```
+ *
+ * @param effect - The function to call after the iterator finishes.
+ * @returns An iterator that re-emits upstream.
+ */
+export function finalize(effect: () => void) {
+  return function* <V>(it: Iterable<V>) {
+    yield* it;
+    effect();
+  };
+}
+
+/**
  * Filters out values from upstream and emits only values for which `predicate` holds
  *
  * ```text

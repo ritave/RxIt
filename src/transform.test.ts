@@ -14,6 +14,7 @@ import {
   endWith,
   every,
   filter,
+  finalize,
   find,
   flatMap,
   map,
@@ -294,6 +295,14 @@ describe('tap', () => {
   it('ignores return value', () => {
     const fn = jest.fn(() => 42);
     expect([...tap(fn)([1, 2, 3])]).toStrictEqual([1, 2, 3]);
+  });
+});
+
+describe('finalize', () => {
+  it('calls an effect', () => {
+    const fn = jest.fn();
+    expect([...finalize(fn)([1, 2, 3])]).toStrictEqual([1, 2, 3]);
+    expect(fn).toHaveBeenCalledTimes(1);
   });
 });
 
