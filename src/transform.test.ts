@@ -174,6 +174,7 @@ describe('every', () => {
   });
 
   it('maintains index', () => {
+    expect.assertions(3);
     let currentIndex = 0;
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     [
@@ -186,6 +187,7 @@ describe('every', () => {
   });
 
   it('provides iterable', () => {
+    expect.assertions(3);
     const iterable = [1, 2, 3];
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     [
@@ -211,24 +213,26 @@ describe('some', () => {
   });
 
   it('maintains index', () => {
+    expect.assertions(3);
     let currentIndex = 0;
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     [
       ...some((_, index) => {
         expect(index).toStrictEqual(currentIndex);
         currentIndex += 1;
-        return true;
+        return false;
       })([1, 2, 3]),
     ];
   });
 
   it('provides iterable', () => {
+    expect.assertions(3);
     const iterable = [1, 2, 3];
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     [
       ...some((_0, _1, providedIterable) => {
         expect(providedIterable).toBe(iterable);
-        return true;
+        return false;
       })(iterable),
     ];
   });
