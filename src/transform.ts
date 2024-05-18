@@ -100,6 +100,33 @@ export const distinctUntilChanged = <V, K = V>(
   };
 
 /**
+ * Emits a value from upstream iterator at a given index
+ *
+ * ```text
+ * --2--3--4--5->
+ * elementAt(1)
+ * -----3-|>
+ * ```
+ *
+ * @param index - The index on to emit.
+ * @throws {@link RangeError} If the upstream iterator finished before the requested index.
+ * @returns An iterator that emits only one value on given index.
+ */
+export function elementAt<V>(index: number) {
+  return function* (it: Iterable<V>) {
+    let currentIndex = 0;
+    for (const el of it) {
+      if (currentIndex === index) {
+        yield el;
+        return;
+      }
+      currentIndex += 1;
+    }
+    throw new RangeError('Iterator finished before expected index.');
+  };
+}
+
+/**
  * Takes an iterator, gathers all upstream values, sorts them and emits them in sorted order.
  *
  * ```text

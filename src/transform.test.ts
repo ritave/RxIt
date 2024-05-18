@@ -10,6 +10,7 @@ import {
   defaultIfEmpty,
   distinct,
   distinctUntilChanged,
+  elementAt,
   filter,
   find,
   flatMap,
@@ -141,6 +142,18 @@ describe('distinctUntilChanged', () => {
         return a === b;
       })([1, 1, 2, 3, 1, 2, 3]),
     ]).not.toThrow();
+  });
+});
+
+describe('elementAt', () => {
+  it('throws RangeError', () => {
+    expect(() => [...elementAt(4)([1, 2, 3])]).toThrow(
+      new RangeError('Iterator finished before expected index.'),
+    );
+  });
+
+  it('returns on index', () => {
+    expect([...elementAt(3)([2, 3, 4, 5, 6, 7])]).toStrictEqual([5]);
   });
 });
 
