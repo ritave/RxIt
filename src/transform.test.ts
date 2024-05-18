@@ -7,6 +7,7 @@ import {
   buffer,
   bufferToggle,
   count,
+  defaultIfEmpty,
   distinct,
   distinctUntilChanged,
   filter,
@@ -31,6 +32,16 @@ describe('count', () => {
 
   it('returns zero on empty', () => {
     expect([...count()([])]).toStrictEqual([0]);
+  });
+});
+
+describe('defaultIfEmpty', () => {
+  it('re-emits upstream', () => {
+    expect([...defaultIfEmpty(42)([1, 2, 3])]).toStrictEqual([1, 2, 3]);
+  });
+
+  it('emits default value', () => {
+    expect([...defaultIfEmpty(42)([])]).toStrictEqual([42]);
   });
 });
 

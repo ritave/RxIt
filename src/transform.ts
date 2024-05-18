@@ -21,6 +21,32 @@ export function count() {
 }
 
 /**
+ * Emits a default value if the upstream iterator is empty
+ *
+ * ```text
+ * ----|>
+ * defaultIfEmpty(42)
+ * ----42-|>
+ * ```
+ *
+ * @param defaultValue - The value to emit.
+ * @returns An iterator that emits upstream or default value if upstream is emtpy.
+ */
+export function defaultIfEmpty<V, R>(defaultValue: R) {
+  return function* (it: Iterable<V>): Iterable<V | R> {
+    let hasEmitted = false;
+    for (const el of it) {
+      yield el;
+      hasEmitted = true;
+    }
+
+    if (!hasEmitted) {
+      yield defaultValue;
+    }
+  };
+}
+
+/**
  * Takes an iterator, emits only values that are distinct from all other previous values
  *
  * ```text
