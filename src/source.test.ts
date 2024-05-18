@@ -1,4 +1,4 @@
-import { concat, empty, generate, just, of, range } from './source';
+import { concat, empty, generate, just, of, range, zip } from './source';
 import { take } from './transform';
 
 describe('concat', () => {
@@ -103,6 +103,23 @@ describe('of', () => {
       1,
       [1, 2],
       [3, 4],
+    ]);
+  });
+});
+
+describe('zip', () => {
+  it('emits tuples', () => {
+    expect([...zip([1, 2, 3], [4, 5, 6], [7, 8, 9])]).toStrictEqual([
+      [1, 4, 7],
+      [2, 5, 8],
+      [3, 6, 9],
+    ]);
+  });
+
+  it('finishes when shortest iterator finishes', () => {
+    expect([...zip([1, 2], [1, 2, 3])]).toStrictEqual([
+      [1, 1],
+      [2, 2],
     ]);
   });
 });

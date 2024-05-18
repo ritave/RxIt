@@ -124,3 +124,33 @@ export function* just<A>(value: A): Iterable<A> {
 export function* of<A>(...values: A[]): Iterable<A> {
   yield* values;
 }
+
+/**
+ * Merges emissions from iterators together into tuples.
+ *
+ * ```text
+ * a
+ * --1-----2-----3-----4->
+ * b
+ * --5-----6-----7-----8->
+ * zip(a,b)
+ * --[1,5]-[2,6]-[3,7]-[4,8]->
+ * ```
+ *
+ * @param values - Iterables to merge together.
+ * @yields A tuple made from values from upstream iterators.
+ */
+export function* zip<V extends any[]>(...values: Iterable<any>[]): Iterable<V> {
+  const iterations = values.map((arg) => arg[Symbol.iterator]());
+  while (true) {
+    const result: V = [] as any;
+    for (const iterator of iterations) {
+      const next = iterator.next();
+      if (next.done) {
+        return;
+      }
+      result.push(next.value);
+    }
+    yield result;
+  }
+}
