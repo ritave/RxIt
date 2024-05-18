@@ -359,6 +359,28 @@ export function findIndex<A>(predicate: (el: A, index: number) => boolean) {
 }
 
 /**
+ * Emits whether the upstream was empty
+ *
+ * ```text
+ * --------|>
+ * isEmpty()
+ * --------true-|>
+ * ```
+ *
+ * @returns An iterator emitting true or false whether the upstream was empty.
+ */
+export function isEmpty() {
+  return function* (it: Iterable<unknown>) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const _ of it) {
+      yield false;
+      return;
+    }
+    yield true;
+  };
+}
+
+/**
  * Takes values from upstream as long as `predicate` holds. After it stops taking, finished immediately.
  *
  * ```text

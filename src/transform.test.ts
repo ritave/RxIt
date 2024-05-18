@@ -18,6 +18,7 @@ import {
   find,
   findIndex,
   flatMap,
+  isEmpty,
   map,
   reduce,
   repeat,
@@ -376,6 +377,16 @@ describe('filter', () => {
     expect([
       ...filter((val: number) => val % 2 === 0)([2, 3, 4, 5, 6]),
     ]).toStrictEqual([2, 4, 6]);
+  });
+});
+
+describe('isEmpty', () => {
+  it('emits false on non-empty', () => {
+    expect([...isEmpty()([1, 2, 3])]).toStrictEqual([false]);
+  });
+
+  it('emits true on empty', () => {
+    expect([...isEmpty()([])]).toStrictEqual([true]);
   });
 });
 
