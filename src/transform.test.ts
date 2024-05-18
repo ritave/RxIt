@@ -16,6 +16,7 @@ import {
   filter,
   finalize,
   find,
+  findIndex,
   flatMap,
   map,
   reduce,
@@ -321,6 +322,44 @@ describe('find', () => {
     expect([
       ...find((val: number) => val % 5 === 0)([1, 2, 3, 5, 6, 10, 15, 20]),
     ]).toStrictEqual([5]);
+  });
+
+  it('maintains the index', () => {
+    expect.assertions(4);
+    let currentIndex = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    [
+      ...find((_: number, index: number) => {
+        expect(currentIndex).toStrictEqual(index);
+        currentIndex += 1;
+        return false;
+      })([1, 2, 3, 4]),
+    ];
+  });
+});
+
+describe('findIndex', () => {
+  it('returns on nothing on always false', () => {
+    expect([...findIndex(() => false)([1, 2, 3])]).toStrictEqual([]);
+  });
+
+  it('returns first found index', () => {
+    expect([
+      ...findIndex((el: number) => el % 5 === 0)([1, 2, 3, 5, 10, 13]),
+    ]).toStrictEqual([3]);
+  });
+
+  it('maintains the index', () => {
+    expect.assertions(4);
+    let currentIndex = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    [
+      ...findIndex((_: number, index: number) => {
+        expect(currentIndex).toStrictEqual(index);
+        currentIndex += 1;
+        return false;
+      })([1, 2, 3, 4]),
+    ];
   });
 });
 

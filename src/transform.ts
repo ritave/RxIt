@@ -323,14 +323,40 @@ export const filter = <A>(predicate: (el: A, index: number) => boolean) =>
  */
 export const find = <A>(predicate: (el: A, index: number) => boolean) =>
   function* (it: Iterable<A>) {
-    const i = 0;
+    let i = 0;
     for (const el of it) {
       if (predicate(el, i)) {
         yield el;
         return;
       }
+      i += 1;
     }
   };
+
+/**
+ * Emits an index of the first value that matches the predicate
+ *
+ * ```text
+ * --1--3--6--5--9--10-|>
+ * findIndex(x => x % 5 === 0)
+ * -----------3-|>
+ * ```
+ *
+ * @param predicate - A test function called on each value.
+ * @returns An iterator with a single found index.
+ */
+export function findIndex<A>(predicate: (el: A, index: number) => boolean) {
+  return function* (it: Iterable<A>) {
+    let i = 0;
+    for (const el of it) {
+      if (predicate(el, i)) {
+        yield i;
+        return;
+      }
+      i += 1;
+    }
+  };
+}
 
 /**
  * Takes values from upstream as long as `predicate` holds. After it stops taking, finished immediately.
