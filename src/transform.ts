@@ -139,7 +139,7 @@ export function elementAt<V>(index: number) {
  * @returns An iterator returning true or false whether all values match.
  */
 export function every<T>(
-  predicate: (value: T, index: number, iterator: Iterable<T>) => boolean,
+  predicate: (value: T, index: number, iterable: Iterable<T>) => boolean,
 ) {
   return function* (it: Iterable<T>) {
     let index = 0;
@@ -151,6 +151,34 @@ export function every<T>(
       index += 1;
     }
     yield true;
+  };
+}
+
+/**
+ * Emits whether any upstream value matches the predicate
+ *
+ * ```text
+ * --3--7--10----9-|>
+ * some(x => x % 5 === 0)
+ * --------true-|>
+ * ```
+ *
+ * @param predicate - A function determining if value matches the condition.
+ * @returns An iterator returning true or false whether any value matches.
+ */
+export function some<T>(
+  predicate: (value: T, index: number, iterable: Iterable<T>) => boolean,
+) {
+  return function* (it: Iterable<T>) {
+    let index = 0;
+    for (const el of it) {
+      if (predicate(el, index, it)) {
+        yield true;
+        return;
+      }
+      index += 1;
+    }
+    yield false;
   };
 }
 

@@ -21,6 +21,7 @@ import {
   repeat,
   skip,
   skipWhile,
+  some,
   sort,
   startWith,
   take,
@@ -160,16 +161,76 @@ describe('elementAt', () => {
 });
 
 describe('every', () => {
-  it('returns true if satisfied', () => {
+  it('returns true if all satisfied', () => {
     expect([
       ...every((el: number) => el % 5 === 0)([5, 10, 15, 20]),
     ]).toStrictEqual([true]);
   });
 
-  it('returns false if not satisfied', () => {
+  it('returns false if any not satisfied', () => {
     expect([
       ...every((el: number) => el % 5 === 0)([5, 10, 18, 20]),
     ]).toStrictEqual([false]);
+  });
+
+  it('maintains index', () => {
+    let currentIndex = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    [
+      ...every((_, index) => {
+        expect(index).toStrictEqual(currentIndex);
+        currentIndex += 1;
+        return true;
+      })([1, 2, 3]),
+    ];
+  });
+
+  it('provides iterable', () => {
+    const iterable = [1, 2, 3];
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    [
+      ...every((_0, _1, providedIterable) => {
+        expect(providedIterable).toBe(iterable);
+        return true;
+      })(iterable),
+    ];
+  });
+});
+
+describe('some', () => {
+  it('returns true if any satisfied', () => {
+    expect([
+      ...some((el: number) => el % 5 === 0)([1, 3, 10, 7]),
+    ]).toStrictEqual([true]);
+  });
+
+  it('returns false if all not satisfied', () => {
+    expect([
+      ...some((el: number) => el % 5 === 0)([1, 2, 3, 4, 6]),
+    ]).toStrictEqual([false]);
+  });
+
+  it('maintains index', () => {
+    let currentIndex = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    [
+      ...some((_, index) => {
+        expect(index).toStrictEqual(currentIndex);
+        currentIndex += 1;
+        return true;
+      })([1, 2, 3]),
+    ];
+  });
+
+  it('provides iterable', () => {
+    const iterable = [1, 2, 3];
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    [
+      ...some((_0, _1, providedIterable) => {
+        expect(providedIterable).toBe(iterable);
+        return true;
+      })(iterable),
+    ];
   });
 });
 
