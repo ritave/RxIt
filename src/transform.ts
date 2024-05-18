@@ -352,7 +352,7 @@ export const skip =
  * Emits `values` before emitting from upstream.
  *
  * ```text
- * -1--2--3
+ * -1--2--3-|>
  * startWith(4, 5, 6)
  * -4--5--6--1--2--3-|>
  * ```
@@ -364,6 +364,25 @@ export function startWith<V, K>(...values: V[]) {
   return function* (it: Iterable<K>) {
     yield* values;
     yield* it;
+  };
+}
+
+/**
+ * Emits `values` after emitting from upstream.
+ *
+ * ```text
+ * -1--2--3-\>
+ * endWith(4, 5, 6)
+ * -1--2--3--4--5--6-|>
+ * ```
+ *
+ * @param values - Values to append after upstream emissions.
+ * @returns An iterator with `values` appended.
+ */
+export function endWith<V, K>(...values: V[]) {
+  return function* (it: Iterable<K>) {
+    yield* it;
+    yield* values;
   };
 }
 

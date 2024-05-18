@@ -11,6 +11,7 @@ import {
   distinct,
   distinctUntilChanged,
   elementAt,
+  endWith,
   filter,
   find,
   flatMap,
@@ -379,6 +380,12 @@ describe('startWith', () => {
     expect([...startWith(4, 5, 6)([1, 2, 3])]).toStrictEqual([
       4, 5, 6, 1, 2, 3,
     ]);
+  });
+});
+
+describe('endWith', () => {
+  it('append after emitting', () => {
+    expect([...endWith(4, 5, 6)([1, 2, 3])]).toStrictEqual([1, 2, 3, 4, 5, 6]);
   });
 });
 
