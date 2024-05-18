@@ -12,6 +12,7 @@ import {
   distinctUntilChanged,
   elementAt,
   endWith,
+  every,
   filter,
   find,
   flatMap,
@@ -155,6 +156,20 @@ describe('elementAt', () => {
 
   it('returns on index', () => {
     expect([...elementAt(3)([2, 3, 4, 5, 6, 7])]).toStrictEqual([5]);
+  });
+});
+
+describe('every', () => {
+  it('returns true if satisfied', () => {
+    expect([
+      ...every((el: number) => el % 5 === 0)([5, 10, 15, 20]),
+    ]).toStrictEqual([true]);
+  });
+
+  it('returns false if not satisfied', () => {
+    expect([
+      ...every((el: number) => el % 5 === 0)([5, 10, 18, 20]),
+    ]).toStrictEqual([false]);
   });
 });
 

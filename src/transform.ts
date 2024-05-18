@@ -127,6 +127,34 @@ export function elementAt<V>(index: number) {
 }
 
 /**
+ * Emits whether each upstream values matches the predicate.
+ *
+ * ```text
+ * --10--15--18----25-|>
+ * every(x => x % 5 === 0)
+ * ----------false-|>
+ * ```
+ *
+ * @param predicate - A function determining if value matches the condition.
+ * @returns An iterator returning true or false whether all values match.
+ */
+export function every<T>(
+  predicate: (value: T, index: number, iterator: Iterable<T>) => boolean,
+) {
+  return function* (it: Iterable<T>) {
+    let index = 0;
+    for (const el of it) {
+      if (!predicate(el, index, it)) {
+        yield false;
+        return;
+      }
+      index += 1;
+    }
+    yield true;
+  };
+}
+
+/**
  * Takes an iterator, gathers all upstream values, sorts them and emits them in sorted order.
  *
  * ```text
